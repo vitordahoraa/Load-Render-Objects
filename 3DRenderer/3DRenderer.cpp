@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include <vector>
 #include <GL/freeglut.h>
@@ -9,16 +9,38 @@ using namespace std;
 
 unsigned int objetoRenderizado;
 vector<vector<float>> vertices;
-vector<vector<int>> faces;
+vector<vector<vector<int>>> faces;
+vector <vector<float>> normais;
 vector<float> rotacao(3, 0);
-vector<float> rotacaoVelocidade(3, 0.1f);
+vector<float> rotacaoVelocidade(3, 0.0f);
 vector<float> OffsetPosition(3, 0.0f);
-float EscalarPosition = 0.4;
+float EscalarPosition = 0.1;
+float colourRed[] = { 1.0, 0.0, 0.0 };
+float colourBlue[] = { 0.0, 0.0, 1.0 };
+float colourGreen[] = { 0.0, 1.0, 0.0 };
 
 void initGL();
 void movimentar3D(double distancia, int direcao);
 //void escalar3D(double escala_x, double escala_y, double escala_z);)
 
+
+// Create custom split() function.  
+vector<string> Split(string str, char separator) {
+    vector<string> strings;
+    int startIndex = 0, endIndex = 0;
+    for (int i = 0; i <= str.size(); i++) {
+
+        // If we reached the end of the word or the end of the input.
+        if (str[i] == separator || i == str.size()) {
+            endIndex = i;
+            string temp;
+            temp.append(str, startIndex, endIndex - startIndex);
+            strings.push_back(temp);
+            startIndex = endIndex + 1;
+        }
+    }
+    return strings;
+}
 
 void keyboard3D(unsigned char key, int x, int y) {
     std::cout << key;
@@ -27,10 +49,10 @@ void keyboard3D(unsigned char key, int x, int y) {
         exit(0);
         break;
     case 'z':
-        EscalarPosition = EscalarPosition + 0.1;
+        EscalarPosition = EscalarPosition * 0.9;
         break;
     case 'x':
-        EscalarPosition = EscalarPosition - 0.1;
+        EscalarPosition = EscalarPosition * 1.1;
         break;
     case 'e':
         movimentar3D( 0.1, 5);
@@ -164,16 +186,36 @@ void loadObj(string fname)
 
             if (tipo == "f")
             {
-                vector<int> face;
-                string x, y, z;
-                arquivo >> x >> y >> z;
-                int fp = stoi(x.substr(0, x.find("/"))) - 1;
-                int fs = stoi(y.substr(0, y.find("/"))) - 1;
-                int ft = stoi(z.substr(0, z.find("/"))) - 1;
-                face.push_back(fp);
-                face.push_back(fs);
-                face.push_back(ft);
+                vector<vector<int>> face;
+
+                vector<int> facePosition;
+                
+                string faceX, faceY, faceZ;
+                arquivo >> faceX >> faceY >> faceZ;
+                vector<string> x = Split(faceX, '/');
+                vector<string> y = Split(faceY, '/');
+                vector<string> z = Split(faceZ, '/');
+                int fp = stoi(x[0]) - 1;
+                int fs = stoi(y[0]) - 1;
+                int ft = stoi(z[0]) - 1;
+                facePosition.push_back(fp);
+                facePosition.push_back(fs);
+                facePosition.push_back(ft);
+
+                face.push_back(facePosition);
+
                 faces.push_back(face);
+            }
+
+            if (tipo == "vn")
+            {
+                vector<float> normal;
+                float x, y, z;
+                arquivo >> x >> y >> z;
+                normal.push_back(x);
+                normal.push_back(y);
+                normal.push_back(z);
+                normais.push_back(normal);
             }
         }
     }
@@ -186,20 +228,34 @@ void loadObj(string fname)
     glNewList(objetoRenderizado, GL_COMPILE);
     {
         glPushMatrix();
-        glBegin(GL_LINES);
+        
+        //glBegin(GL_LINES);
+        glBegin(GL_TRIANGLES);
+
+        GLfloat cor_verde[] = { 0.0, 1.0, 0.0, 1.0 };
+        GLfloat cor_branco[] = { 1.0, 1.0, 1.0, 1.0 };
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, cor_verde);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, cor_branco);
+        glMaterialf(GL_FRONT, GL_SHININESS, 100);
 
         for (int i = 0; i < faces.size(); i++)
         {
-            vector<int> face = faces[i];
+            vector<int> face = faces[i][0];
 
-            glVertex3f(vertices[face[0]][0], vertices[face[0]][1], vertices[face[0]][2]);
+
+            //glNormal3f(0, 0, 1);
+            //glNormal3f(0, 1, 0);
+            glNormal3f(1, 0, 0);
+
+            glColor3f(colourRed[0], colourRed[1], colourRed[2]); // colour
+            glVertex3f(vertices[face[0]][0], vertices[face[0]][1], vertices[face[0]][2]); 
+            //glVertex3f(vertices[face[1]][0], vertices[face[1]][1], vertices[face[1]][2]);
+            glColor3f(colourBlue[0], colourBlue[1], colourBlue[2]); // colour
             glVertex3f(vertices[face[1]][0], vertices[face[1]][1], vertices[face[1]][2]);
-
-            glVertex3f(vertices[face[1]][0], vertices[face[1]][1], vertices[face[1]][2]);
+            //glVertex3f(vertices[face[2]][0], vertices[face[2]][1], vertices[face[2]][2]);
+            glColor3f(colourGreen[0], colourGreen[1], colourGreen[2]); // colour
             glVertex3f(vertices[face[2]][0], vertices[face[2]][1], vertices[face[2]][2]);
-
-            glVertex3f(vertices[face[2]][0], vertices[face[2]][1], vertices[face[2]][2]);
-            glVertex3f(vertices[face[0]][0], vertices[face[0]][1], vertices[face[0]][2]);
+            //glVertex3f(vertices[face[0]][0], vertices[face[0]][1], vertices[face[0]][2]);
 
         }
         glEnd();
@@ -226,9 +282,15 @@ void reshape(GLsizei width, GLsizei height) {
 void renderObject()
 {
     glPushMatrix();
+    GLfloat cor_verde[] = { 0.0, 1.0, 0.0, 1.0 };
+    GLfloat cor_branco[] = { 1.0, 1.0, 1.0, 1.0 };
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, cor_verde);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, cor_branco);
+    glMaterialf(GL_FRONT, GL_SHININESS, 100);
+
     glTranslatef(OffsetPosition[0], OffsetPosition[1], OffsetPosition[2]);
     glColor3f(1.0, 0.23, 0.27);
-    glScalef(0.1, 0.1, 0.1);
+    glScalef(EscalarPosition, EscalarPosition, EscalarPosition);
     glRotatef(rotacao[0], 0, 1, 0);
     glRotatef(rotacao[1], 1, 0, 0);
     glRotatef(rotacao[2], 0, 0, 1);
@@ -247,6 +309,7 @@ void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
     renderObject();
     glutSwapBuffers();
 }
@@ -255,6 +318,27 @@ void initGL() {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glEnable(GL_DEPTH_TEST);   // Habilita o culling de profundidade
     glDepthFunc(GL_LEQUAL);    // Define o tipo de teste de profundidade
+
+    //GLfloat CorLuzAmbiente[] = { 1.0, 1.0, 1.0};
+    
+
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    // Ativa o "Color Tracking"
+    glEnable(GL_COLOR_MATERIAL);
+
+    GLfloat luz_ambiente[] = { 0.2, 0.2, 0.2, 0.2 };
+    //GLfloat luz_difusa[] = { 0.8, 0.8, 0.8, 1.0 };
+    //GLfloat luz_especular[] = { 1.0, 1.0, 1.0, 1.0 };
+    glLightfv(GL_LIGHT0, GL_AMBIENT, luz_ambiente);
+    //glLightfv(GL_LIGHT0, GL_DIFFUSE, luz_difusa);
+    //glLightfv(GL_LIGHT0, GL_SPECULAR, luz_especular);
+
+    //determina a posiзгo da luz
+    GLfloat posicao_luz[] = { 10.5, 10.5, 10.0, 1.0 };
+    glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz);
+
 }
 
 void timer(int value) {
@@ -274,7 +358,7 @@ int main(int argc, char** argv)
     glutReshapeFunc(reshape);
     glutDisplayFunc(display);
     glutTimerFunc(10, timer, 0);
-    loadObj("data/porsche.obj");
+    loadObj("data/teddy.obj");
     initGL();
     glutMainLoop();
     return 0;
