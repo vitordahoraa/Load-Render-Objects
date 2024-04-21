@@ -1,0 +1,71 @@
+﻿  3DRenderer.cpp
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(16,28): warning C4305: 'inicializando': truncamento de 'double' para 'float'
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(30,43): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(33,43): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(91,47): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(95,47): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(99,47): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(103,47): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(107,47): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(111,47): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(115,53): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(119,53): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(123,53): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(127,53): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(131,53): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(135,53): warning C4244: '=': conversão de 'double' para '_Ty', possível perda de dados
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(143,17): warning C4101: 'z': variável local não referenciada
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(143,14): warning C4101: 'y': variável local não referenciada
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(143,11): warning C4101: 'x': variável local não referenciada
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(142,9): warning C4101: 'read': variável local não referenciada
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(230,30): warning C4305: 'argumento': truncamento de 'double' para 'GLfloat'
+C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\3DRenderer\3DRenderer.cpp(231,27): warning C4305: 'argumento': truncamento de 'double' para 'GLfloat'
+  3DRenderer.vcxproj -> C:\Users\vitor\Documents\Projetos\Computação Gráfica\Trabalho02\3DRenderer\x64\Debug\3DRenderer.exe
