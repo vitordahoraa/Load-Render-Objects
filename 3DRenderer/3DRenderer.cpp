@@ -6,10 +6,10 @@
 using namespace std;
 
 //globals
-
+struct Face;
 unsigned int objetoRenderizado;
 vector<vector<float>> vertices;
-vector<vector<vector<int>>> faces;
+vector<Face> faces;
 vector <vector<float>> normais;
 vector<float> rotacao(3, 0);
 vector<float> rotacaoVelocidade(3, 0.0f);
@@ -19,8 +19,20 @@ float colourRed[] = { 1.0, 0.0, 0.0 };
 float colourBlue[] = { 0.0, 0.0, 1.0 };
 float colourGreen[] = { 0.0, 1.0, 0.0 };
 
+
+GLfloat luz_ambiente[] = { 0.2, 0.2, 0.2, 1.0 };
+GLfloat luz_difusa[] = { 0.8, 0.8, 0.8, 1.0 };
+GLfloat luz_especular[] = { 1.0, 1.0, 1.0, 1.0 };
+
+struct Face {
+    vector<int> vertices;
+    vector<int> normais;
+    vector<int> texturas;
+};
+
 void initGL();
 void movimentar3D(double distancia, int direcao);
+void loadObj(string fname, int position_z_offset);
 //void escalar3D(double escala_x, double escala_y, double escala_z);)
 
 
@@ -159,7 +171,7 @@ void movimentar3D( double distancia, int direcao) {
     }
 }
 
-void loadObj(string fname)
+void loadObj(string fname, int position_z_offset)
 {
     int read;
     float x, y, z;
@@ -186,25 +198,87 @@ void loadObj(string fname)
 
             if (tipo == "f")
             {
-                vector<vector<int>> face;
-
-                vector<int> facePosition;
+                Face new_face;
                 
                 string faceX, faceY, faceZ;
                 arquivo >> faceX >> faceY >> faceZ;
                 vector<string> x = Split(faceX, '/');
                 vector<string> y = Split(faceY, '/');
                 vector<string> z = Split(faceZ, '/');
-                int fp = stoi(x[0]) - 1;
-                int fs = stoi(y[0]) - 1;
-                int ft = stoi(z[0]) - 1;
-                facePosition.push_back(fp);
-                facePosition.push_back(fs);
-                facePosition.push_back(ft);
 
-                face.push_back(facePosition);
+                //Verificar quantidade de barras na face
 
-                faces.push_back(face);
+                // Se for duas
+                if (x.size() == 3 and y.size() == 3 and z.size() == 3) {
+
+                    int vertice_face_x = stoi(x[0]) - 1;
+                    int vertice_face_y = stoi(y[0]) - 1;
+                    int vertice_face_z = stoi(z[0]) - 1;
+
+
+                    new_face.vertices.push_back(vertice_face_x);
+                    new_face.vertices.push_back(vertice_face_y);
+                    new_face.vertices.push_back(vertice_face_z);
+
+                    // Verificar se Textura está vázia
+                    if (!x[1].empty() and !y[1].empty() and !z[1].empty()) {
+                        int textura_face_x = stoi(x[1]) - 1;
+                        int textura_face_y = stoi(y[1]) - 1;
+                        int textura_face_z = stoi(z[1]) - 1;
+
+                        new_face.texturas.push_back(textura_face_x);
+                        new_face.texturas.push_back(textura_face_y);
+                        new_face.texturas.push_back(textura_face_z);
+                    }
+
+                    int normal_face_x = stoi(x[2]) - 1;
+                    int normal_face_y = stoi(y[2]) - 1;
+                    int normal_face_z = stoi(z[2]) - 1;
+
+
+                    new_face.normais.push_back(normal_face_x);
+                    new_face.normais.push_back(normal_face_y);
+                    new_face.normais.push_back(normal_face_z);
+
+
+
+                    faces.push_back(new_face);
+                }
+                else if (x.size() == 2 and y.size() == 2 and z.size() == 2) {
+
+                    int vertice_face_x = stoi(x[0]) - 1;
+                    int vertice_face_y = stoi(y[0]) - 1;
+                    int vertice_face_z = stoi(z[0]) - 1;
+
+                    int textura_face_x = stoi(x[1]) - 1;
+                    int textura_face_y = stoi(y[1]) - 1;
+                    int textura_face_z = stoi(z[1]) - 1;
+
+                    new_face.vertices.push_back(vertice_face_x);
+                    new_face.vertices.push_back(vertice_face_y);
+                    new_face.vertices.push_back(vertice_face_z);
+
+                    new_face.texturas.push_back(textura_face_x);
+                    new_face.texturas.push_back(textura_face_y);
+                    new_face.texturas.push_back(textura_face_z);
+
+
+
+                    faces.push_back(new_face);
+
+                }else if (x.size() == 1 and y.size() == 1 and z.size() == 1) {
+
+                    int vertice_face_x = stoi(x[0]) - 1;
+                    int vertice_face_y = stoi(y[0]) - 1;
+                    int vertice_face_z = stoi(z[0]) - 1;
+
+
+                    new_face.vertices.push_back(vertice_face_x);
+                    new_face.vertices.push_back(vertice_face_y);
+                    new_face.vertices.push_back(vertice_face_z);
+
+                    faces.push_back(new_face);
+                }
             }
 
             if (tipo == "vn")
@@ -240,21 +314,21 @@ void loadObj(string fname)
 
         for (int i = 0; i < faces.size(); i++)
         {
-            vector<int> face = faces[i][0];
+            Face face = faces[i];
 
 
             //glNormal3f(0, 0, 1);
             //glNormal3f(0, 1, 0);
-            glNormal3f(1, 0, 0);
+            glNormal3f(0, 1, 0);
 
             glColor3f(colourRed[0], colourRed[1], colourRed[2]); // colour
-            glVertex3f(vertices[face[0]][0], vertices[face[0]][1], vertices[face[0]][2]); 
+            glVertex3f(vertices[face.vertices[0]][0], vertices[face.vertices[0]][1], vertices[face.vertices[0]][2] + position_z_offset);
             //glVertex3f(vertices[face[1]][0], vertices[face[1]][1], vertices[face[1]][2]);
             glColor3f(colourBlue[0], colourBlue[1], colourBlue[2]); // colour
-            glVertex3f(vertices[face[1]][0], vertices[face[1]][1], vertices[face[1]][2]);
+            glVertex3f(vertices[face.vertices[1]][0], vertices[face.vertices[1]][1], vertices[face.vertices[1]][2] + position_z_offset);
             //glVertex3f(vertices[face[2]][0], vertices[face[2]][1], vertices[face[2]][2]);
             glColor3f(colourGreen[0], colourGreen[1], colourGreen[2]); // colour
-            glVertex3f(vertices[face[2]][0], vertices[face[2]][1], vertices[face[2]][2]);
+            glVertex3f(vertices[face.vertices[2]][0], vertices[face.vertices[2]][1], vertices[face.vertices[2]][2] + position_z_offset);
             //glVertex3f(vertices[face[0]][0], vertices[face[0]][1], vertices[face[0]][2]);
 
         }
@@ -282,11 +356,11 @@ void reshape(GLsizei width, GLsizei height) {
 void renderObject()
 {
     glPushMatrix();
-    GLfloat cor_verde[] = { 0.0, 1.0, 0.0, 1.0 };
-    GLfloat cor_branco[] = { 1.0, 1.0, 1.0, 1.0 };
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, cor_verde);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, cor_branco);
-    glMaterialf(GL_FRONT, GL_SHININESS, 100);
+
+
+    //determina a posiзгo da luz
+    GLfloat posicao_luz[] = { 0,0,19.5};
+    glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz);
 
     glTranslatef(OffsetPosition[0], OffsetPosition[1], OffsetPosition[2]);
     glColor3f(1.0, 0.23, 0.27);
@@ -308,8 +382,7 @@ void renderObject()
 void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+//    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
     renderObject();
     glutSwapBuffers();
 }
@@ -319,6 +392,9 @@ void initGL() {
     glEnable(GL_DEPTH_TEST);   // Habilita o culling de profundidade
     glDepthFunc(GL_LEQUAL);    // Define o tipo de teste de profundidade
 
+    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+
+    glLoadIdentity();
     //GLfloat CorLuzAmbiente[] = { 1.0, 1.0, 1.0};
     
 
@@ -328,16 +404,14 @@ void initGL() {
     // Ativa o "Color Tracking"
     glEnable(GL_COLOR_MATERIAL);
 
-    GLfloat luz_ambiente[] = { 0.2, 0.2, 0.2, 0.2 };
-    //GLfloat luz_difusa[] = { 0.8, 0.8, 0.8, 1.0 };
-    //GLfloat luz_especular[] = { 1.0, 1.0, 1.0, 1.0 };
-    glLightfv(GL_LIGHT0, GL_AMBIENT, luz_ambiente);
-    //glLightfv(GL_LIGHT0, GL_DIFFUSE, luz_difusa);
-    //glLightfv(GL_LIGHT0, GL_SPECULAR, luz_especular);
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, luz_ambiente);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, luz_difusa);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, luz_especular);
+    glMateriali(GL_FRONT, GL_SHININESS, 128);
 
-    //determina a posiзгo da luz
-    GLfloat posicao_luz[] = { 10.5, 10.5, 10.0, 1.0 };
-    glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz);
+
+
 
 }
 
@@ -348,6 +422,7 @@ void timer(int value) {
 
 int main(int argc, char** argv)
 {
+    OffsetPosition[2] = OffsetPosition[2] - 20;
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(800, 450);
@@ -358,7 +433,7 @@ int main(int argc, char** argv)
     glutReshapeFunc(reshape);
     glutDisplayFunc(display);
     glutTimerFunc(10, timer, 0);
-    loadObj("data/teddy.obj");
+    loadObj("data/teddy.obj",0);
     initGL();
     glutMainLoop();
     return 0;
