@@ -450,7 +450,7 @@ void initGL() {
 
     //glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
     
-    //glMateriali(GL_FRONT, GL_SHININESS, 128);
+    glMateriali(GL_FRONT, GL_SHININESS, 128);
 }
 
 void timer(int value) {
@@ -472,7 +472,7 @@ int main(int argc, char** argv)
     glutReshapeFunc(reshape);
     glutDisplayFunc(display);
     glutTimerFunc(10, timer, 0);
-    loadObj("data/porsche.obj",0);
+    loadObj("data/elepham.obj",0);
     glutMainLoop();
     return 0;
 }
