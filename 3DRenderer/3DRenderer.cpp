@@ -66,12 +66,35 @@ void keyboard3D(unsigned char key, int x, int y) {
     case 'x':
         EscalarPosition = EscalarPosition * 1.1;
         break;
+
     case 'e':
-        movimentar3D( 0.1, 5);
+        movimentar3D(0.1, 5);
         break;
     case 'q':
-        movimentar3D( 0.1, 6);
+        movimentar3D(0.1, 6);
         break;
+
+    case 'n':
+        glDisable(GL_LIGHT0);
+        break;
+    case 'm':
+        glEnable(GL_LIGHT0);
+        break;
+
+    case 'j':
+        glDisable(GL_LIGHT1);
+        break;
+    case 'k':
+        glEnable(GL_LIGHT1);
+        break;
+
+    case 'i':
+        glDisable(GL_LIGHT2);
+        break;
+    case 'o':
+        glEnable(GL_LIGHT2);
+        break;
+
     case '1':
         movimentar3D( 0.1, 7);
         break;
@@ -306,11 +329,14 @@ void loadObj(string fname, int position_z_offset)
         //glBegin(GL_LINES);
         glBegin(GL_TRIANGLES);
 
+        GLfloat cor_preto[] = { 0.0, 0.0, 0.0, 1.0 };
         GLfloat cor_verde[] = { 0.0, 1.0, 0.0, 1.0 };
         GLfloat cor_branco[] = { 1.0, 1.0, 1.0, 1.0 };
         glMaterialfv(GL_FRONT, GL_DIFFUSE, cor_verde);
+        
+        //glMaterialfv(GL_FRONT, GL_AMBIENT, cor_verde);
         glMaterialfv(GL_FRONT, GL_SPECULAR, cor_branco);
-        glMaterialf(GL_FRONT, GL_SHININESS, 100);
+        glMaterialf(GL_FRONT, GL_SHININESS, 60);
 
         for (int i = 0; i < faces.size(); i++)
         {
@@ -319,7 +345,13 @@ void loadObj(string fname, int position_z_offset)
 
             //glNormal3f(0, 0, 1);
             //glNormal3f(0, 1, 0);
-            glNormal3f(0, 1, 0);
+            
+            if (!face.normais.empty()) {
+                glNormal3f(face.normais[0], face.normais[1], face.normais[2]);
+            }
+            else {
+                glNormal3f(0, 0, 1);
+            }
 
             glColor3f(colourRed[0], colourRed[1], colourRed[2]); // colour
             glVertex3f(vertices[face.vertices[0]][0], vertices[face.vertices[0]][1], vertices[face.vertices[0]][2] + position_z_offset);
@@ -348,7 +380,7 @@ void reshape(GLsizei width, GLsizei height) {
     glViewport(0, 0, width, height);
 
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+    //glLoadIdentity();
     gluPerspective(60, aspect, 0.1, 1000);
     glMatrixMode(GL_MODELVIEW);
 }
@@ -359,15 +391,20 @@ void renderObject()
 
 
     //determina a posiзгo da luz
-    GLfloat posicao_luz[] = { 0,0,19.5};
-    glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz);
+
 
     glTranslatef(OffsetPosition[0], OffsetPosition[1], OffsetPosition[2]);
-    glColor3f(1.0, 0.23, 0.27);
+    //glColor3f(1.0, 0.23, 0.27);
     glScalef(EscalarPosition, EscalarPosition, EscalarPosition);
     glRotatef(rotacao[0], 0, 1, 0);
     glRotatef(rotacao[1], 1, 0, 0);
     glRotatef(rotacao[2], 0, 0, 1);
+
+    GLfloat posicao_luz[] = { 0, 0 , 19.5 ,1 };
+
+    glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz);
+    glLightfv(GL_LIGHT1, GL_POSITION, posicao_luz);
+    glLightfv(GL_LIGHT2, GL_POSITION, posicao_luz);
     glCallList(objetoRenderizado);
     glPopMatrix();
     rotacao[0] = rotacao[0] + rotacaoVelocidade[0];
@@ -392,27 +429,28 @@ void initGL() {
     glEnable(GL_DEPTH_TEST);   // Habilita o culling de profundidade
     glDepthFunc(GL_LEQUAL);    // Define o tipo de teste de profundidade
 
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+    //glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 
     glLoadIdentity();
-    //GLfloat CorLuzAmbiente[] = { 1.0, 1.0, 1.0};
     
 
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHT2);
+
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, luz_ambiente);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, luz_difusa);
+    glLightfv(GL_LIGHT2, GL_SPECULAR, luz_especular);
+
     // Ativa o "Color Tracking"
     glEnable(GL_COLOR_MATERIAL);
 
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, luz_ambiente);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, luz_difusa);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, luz_especular);
-    glMateriali(GL_FRONT, GL_SHININESS, 128);
-
-
-
-
+    //glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    
+    //glMateriali(GL_FRONT, GL_SHININESS, 128);
 }
 
 void timer(int value) {
@@ -428,13 +466,13 @@ int main(int argc, char** argv)
     glutInitWindowSize(800, 450);
     glutInitWindowPosition(20, 20);
     glutCreateWindow("Carregar OBJ");
+    initGL();
     glutKeyboardFunc(keyboard3D);
     glutSpecialFunc(keyboard_special3D);
     glutReshapeFunc(reshape);
     glutDisplayFunc(display);
     glutTimerFunc(10, timer, 0);
-    loadObj("data/teddy.obj",0);
-    initGL();
+    loadObj("data/porsche.obj",0);
     glutMainLoop();
     return 0;
 }
